@@ -8,6 +8,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.util.Log;
 
 import com.developer.andrew.startappwithfcm.activity.AlarmActivity;
 import com.developer.andrew.startappwithfcm.service.AlarmService;
@@ -16,6 +17,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
+
+        Log.d("AlarmReceiver", "get FCM event");
+
+        String custom = intent.getStringExtra("custom");
+        Log.d("custom", custom);
+
         AlarmActivity inst = AlarmActivity.instance();
         if (inst != null) inst.setTextViewMessage("Alarm! Wake up! Wake up!");
 

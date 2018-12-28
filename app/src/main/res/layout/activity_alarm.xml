@@ -36,6 +36,24 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center_horizontal">
+
+
+        <Button
+            android:id="@+id/btnGoToMain"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="到首頁"
+            android:textSize="24sp" />
+
+    </LinearLayout>
+
+
     <TextView
         android:id="@+id/message"
         android:textSize="40dp"

@@ -1,11 +1,14 @@
 package com.developer.andrew.startappwithfcm.activity;
 
 import android.app.AlarmManager;
+import android.app.KeyguardManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,9 +18,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.developer.andrew.startappwithfcm.MainActivity;
 import com.developer.andrew.startappwithfcm.MyConstants;
 import com.developer.andrew.startappwithfcm.R;
 import com.developer.andrew.startappwithfcm.receiver.AlarmReceiver;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.Calendar;
 
@@ -49,23 +54,29 @@ public class AlarmActivity extends FragmentActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alarm);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
+        setContentView(R.layout.activity_alarm);
         textViewTime = (TextView) findViewById(R.id.textViewTime);
         textViewTime.setText(timeHour + ":" + timeMinute);
 
         textViewMessage = (TextView) findViewById(R.id.message);
 
+        // Get updated InstanceID token.
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        Log.d("AlarmActivity", "Refreshed token: " + refreshedToken);
+
         Button btnStart = (Button) findViewById(R.id.btnStart);
         Button btnStop = (Button) findViewById(R.id.btnStop);
+        Button btnGoToMain = (Button) findViewById(R.id.btnGoToMain);
 
         btnStart.setOnClickListener(this);
         btnStop.setOnClickListener(this);
+        btnGoToMain.setOnClickListener(this);
     }
 
     @Override
@@ -88,7 +99,25 @@ public class AlarmActivity extends FragmentActivity implements View.OnClickListe
             cancelAlarm();
             setTextViewMessage("");
             Log.d("MyActivity", "Alarm Off");
+        } else if (v.getId() == R.id.btnGoToMain) {
+            this.unlockScreen();
+            startActivity(new Intent(this, MainActivity.class));
         }
+    }
+
+
+    private void unlockScreen() {
+        Log.d("unlockScreen", "we will unlock screen !!!");
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
+        kl.disableKeyguard();
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
+                | PowerManager.ACQUIRE_CAUSES_WAKEUP
+                | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
+        wakeLock.acquire();
+        wakeLock.release();
     }
 
     class MyHandler extends Handler {
